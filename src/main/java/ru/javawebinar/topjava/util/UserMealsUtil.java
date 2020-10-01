@@ -3,6 +3,9 @@ package ru.javawebinar.topjava.util;
 import ru.javawebinar.topjava.model.UserMeal;
 import ru.javawebinar.topjava.model.UserMealWithExcess;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,21 +36,23 @@ public class UserMealsUtil {
         final LocalTime startTime = LocalTime.of(7, 0);
         final LocalTime endTime = LocalTime.of(12, 0);
 
-        List<UserMealWithExcess> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
-        mealsTo.forEach(System.out::println);
+//        List<UserMealWithExcess> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
+//        mealsTo.forEach(System.out::println);
+//
+//        System.out.println(filteredByCycles(meals, startTime, endTime, 2000));
+//
+//        System.out.println(filteredByRecursion(meals, startTime, endTime, 2000));
+//        //System.out.println(filteredByAtomic(meals, startTime, endTime, 2000));
+//        //System.out.println(filteredByReflection(meals, startTime, endTime, 2000));
+//        //System.out.println(filteredByClosure(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByExecutor(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByLock(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByPredicate(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByFlatMap(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
 
-        System.out.println(filteredByCycles(meals, startTime, endTime, 2000));
-
-        System.out.println(filteredByRecursion(meals, startTime, endTime, 2000));
-        //System.out.println(filteredByAtomic(meals, startTime, endTime, 2000));
-        //System.out.println(filteredByReflection(meals, startTime, endTime, 2000));
-        //System.out.println(filteredByClosure(meals, startTime, endTime, 2000));
-        System.out.println(filteredByExecutor(meals, startTime, endTime, 2000));
-        System.out.println(filteredByLock(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, 2000));
-        System.out.println(filteredByPredicate(meals, startTime, endTime, 2000));
-        System.out.println(filteredByFlatMap(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
+        System.out.println(filteredByDatabase(meals, startTime, endTime, 2000));
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -273,6 +278,24 @@ public class UserMealsUtil {
                 ).values();
 
         return values.stream().flatMap(identity()).collect(toList());
+    }
+
+    public static List<UserMealWithExcess> filteredByDatabase(List<UserMeal> meals, LocalTime startTima, LocalTime endTime, int caloriesPerDay) {
+        try {
+            Class.forName("org.hsqldb.jdbcDriver"); //Проверяем наличие JDBC драйвера для работы с БД
+            Connection connection = DriverManager.getConnection("jdbc:hsqldb:mem:connection", "sa", "");//соединениесБД
+            System.out.println("Соединение с СУБД выполнено.");
+            connection.close();       // отключение от БД
+            System.out.println("Отключение от СУБД выполнено.");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace(); // обработка ошибки  Class.forName
+            System.out.println("JDBC драйвер для СУБД не найден!");
+        } catch (SQLException e) {
+            e.printStackTrace(); // обработка ошибок  DriverManager.getConnection
+            System.out.println("Ошибка SQL !");
+        }
+
+        return null;
     }
 
     private static UserMealWithExcess createTo(UserMeal meal, boolean excess) {
